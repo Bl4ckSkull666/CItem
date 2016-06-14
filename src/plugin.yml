@@ -1,0 +1,11 @@
+name: CItem
+version: 1.0
+author: Bl4ckSkull666
+main: de.bl4ckskull666.citem.CItem
+softdepend: [Mu1ti1ingu41]
+website: http://www.AMC-Server.de
+prefix: CI
+commands:
+  give:
+    description: 'Allow you to give you or other ppls some cheating items.'
+    usage: /<command> help

@@ -1,0 +1,26 @@
+use-plugin:
+  mu1ti1ingu41: false
+need-material-permission: false
+enchantments:
+  fire_protection: PROTECTION_FIRE
+  blast_protection: PROTECTION_EXPLOSIONS
+  projectile_protection: PROTECTION_PROJECTILE
+  protection: PROTECTION_ENVIRONMENTAL
+  feather_falling: PROTECTION_FALL
+  respiration: OXYGEN
+  aqua_affinity: WATER_WORKER
+  sharpness: DAMAGE_ALL
+  smite: DAMAGE_UNDEAD
+  bane_of_arthropods: DAMAGE_ARTHROPODS
+  knockback: KNOCKBACK
+  fire_aspect: FIRE_ASPECT
+  looting: LOOT_BONUS_MOBS
+  power: ARROW_DAMAGE
+  punch: ARROW_KNOCKBACK
+  flame: ARROW_FIRE
+  infinity: ARROW_INFINITE
+  efficiency: DIG_SPEED
+  unbreaking: DURABILITY
+  silk_touch: SILK_TOUCH
+  fortune: LOOT_BONUS_BLOCKS
+  thorns: THORNS
