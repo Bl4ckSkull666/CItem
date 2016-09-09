@@ -1,6 +1,7 @@
 package de.bl4ckskull666.citem.classes;
 
 import de.bl4ckskull666.citem.CItem;
+import static de.bl4ckskull666.citem.utils.Util.UpperFirst;
 import de.bl4ckskull666.mu1ti1ingu41.Language;
 import de.bl4ckskull666.mu1ti1ingu41.Mu1ti1ingu41;
 import de.bl4ckskull666.mu1ti1ingu41.utils.Utils;
@@ -20,6 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -93,6 +95,14 @@ public final class LanguageManager {
             }
         }
         p.sendMessage(replaceAll(_fc.getString(path), search, replace));
+    }
+    
+    public String getItemName(UUID uuid, ItemStack item) {
+        if(_isMu1ti1ingu41)
+            return Language.getItemName(uuid, item);
+        
+        String extra = (item.getType().getMaxDurability() > 0)?(":" + item.getDurability()):"";
+        return getText(uuid, "item-name." + item.getType().name().toLowerCase() + extra, UpperFirst(item.getType().name().replace("_", " ")));
     }
     
     public String getText(UUID uuid, String path, String def) {

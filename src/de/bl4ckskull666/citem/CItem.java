@@ -61,7 +61,7 @@ extends JavaPlugin {
 
     public static int getInt(String path, int def) {
         if (!_p.getConfig().isInt(path)) {
-            _p.getConfig().set(path, (Object)def);
+            _p.getConfig().set(path, def);
             _p.saveConfig();
             return def;
         }
@@ -70,7 +70,7 @@ extends JavaPlugin {
 
     public static boolean getBoolean(String path, boolean def) {
         if (!_p.getConfig().isBoolean(path)) {
-            _p.getConfig().set(path, (Object)def);
+            _p.getConfig().set(path, def);
             _p.saveConfig();
             return def;
         }
@@ -107,7 +107,7 @@ extends JavaPlugin {
         }
         
         String[] itemname = args[0].split("\\:");
-        if(Material.matchMaterial((String)itemname[0]) == null) {
+        if(Material.matchMaterial(itemname[0]) == null) {
             _p.getLogger().log(Level.INFO, "{0} ist kein gultiges Item.", itemname[0]);
             return null;
         }
@@ -122,13 +122,12 @@ extends JavaPlugin {
                 if(sargs.length != 2)
                     continue;
                 
-                switch (sargs[0].toLowerCase()) {
+                switch(sargs[0].toLowerCase()) {
                     case "lore":
                         String[] msg = sargs[1].split("\\|");
-                        if (msg.length > 4) continue block18;
                         ArrayList<String> lore = new ArrayList<>();
                         for(String msg1: msg)
-                            lore.add(ChatColor.translateAlternateColorCodes((char)'&', msg1.replaceAll("_", " ")));
+                            lore.add(ChatColor.translateAlternateColorCodes('&', msg1.replaceAll("_", " ")));
                         CItem.setLore(i, lore);
                         break;
                     case "name":
@@ -153,15 +152,15 @@ extends JavaPlugin {
                         for(Enchantment en : Enchantment.values()) {
                             if(!en.canEnchantItem(i))
                                 continue;
-                            CItem.setEnchantment(i, en.getName(), sargs[1].equalsIgnoreCase("min") ? en.getStartLevel() : en.getMaxLevel());
+                            CItem.setEnchantment(i, en.getName(), sargs[1].equalsIgnoreCase("min")?en.getStartLevel():en.getMaxLevel());
                         }
                         break;
                     default:
-                        if((Enchantment.getByName((String)sargs[0].toUpperCase()) != null || CItem.getEnchant(sargs[0]) != null) && Util.isNumeric(sargs[1])) {
+                        if((Enchantment.getByName(sargs[0].toUpperCase()) != null || CItem.getEnchant(sargs[0]) != null) && Util.isNumeric(sargs[1])) {
                             CItem.setEnchantment(i, sargs[0], Integer.parseInt(sargs[1]));
                             break;
                         }
-                        _p.getLogger().log(Level.INFO, "Ignore {0}:{1}", new Object[]{sargs[0], sargs[1]});
+                        _p.getLogger().log(Level.INFO, "Ignore {0}:{1}", new Object[] {sargs[0], sargs[1]});
                 }
             }
         }
@@ -170,7 +169,7 @@ extends JavaPlugin {
 
     private static void setItemName(ItemStack i, String name) {
         ItemMeta im = i.getItemMeta();
-        im.setDisplayName(ChatColor.translateAlternateColorCodes((char)'&', (String)name.replaceAll("_", " ")));
+        im.setDisplayName(ChatColor.translateAlternateColorCodes('&', (String)name.replaceAll("_", " ")));
         i.setItemMeta(im);
     }
 
@@ -181,11 +180,11 @@ extends JavaPlugin {
     }
 
     private static void setColor(ItemStack i, String color) {
-        if (i.getItemMeta() instanceof LeatherArmorMeta) {
+        if(i.getItemMeta() instanceof LeatherArmorMeta) {
             LeatherArmorMeta lam = (LeatherArmorMeta)i.getItemMeta();
             String[] rgb = color.split("\\,");
-            if (rgb.length == 3 && Util.isNumeric(rgb[0]) && Util.isNumeric(rgb[1]) && Util.isNumeric(rgb[2]) && Integer.parseInt(rgb[0]) >= 0 && Integer.parseInt(rgb[0]) <= 255 && Integer.parseInt(rgb[1]) >= 0 && Integer.parseInt(rgb[1]) <= 255 && Integer.parseInt(rgb[2]) >= 0 && Integer.parseInt(rgb[2]) <= 255) {
-                Color c = Color.fromRGB((int)Integer.parseInt(rgb[0]), (int)Integer.parseInt(rgb[1]), (int)Integer.parseInt(rgb[2]));
+            if(rgb.length == 3 && Util.isNumeric(rgb[0]) && Util.isNumeric(rgb[1]) && Util.isNumeric(rgb[2]) && Integer.parseInt(rgb[0]) >= 0 && Integer.parseInt(rgb[0]) <= 255 && Integer.parseInt(rgb[1]) >= 0 && Integer.parseInt(rgb[1]) <= 255 && Integer.parseInt(rgb[2]) >= 0 && Integer.parseInt(rgb[2]) <= 255) {
+                Color c = Color.fromRGB(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
                 lam.setColor(c);
             }
             i.setItemMeta((ItemMeta)lam);
@@ -220,7 +219,7 @@ extends JavaPlugin {
         SkullMeta sm = (SkullMeta)i.getItemMeta();
         sm.setOwner(name);
         sm.setDisplayName(name);
-        i.setItemMeta((ItemMeta)sm);
+        i.setItemMeta(sm);
     }
 
     private static void setBook(ItemStack i, String book) {
@@ -250,7 +249,7 @@ extends JavaPlugin {
         } else {
             ItemMeta im = i.getItemMeta();
             im.addEnchant(e, lvl, true);
-            if (!im.hasEnchant(e)) {
+            if(!im.hasEnchant(e)) {
                 _p.getLogger().log(Level.INFO, "Failed to add {0} to the ItemMeta.", ench);
             }
             i.setItemMeta(im);
@@ -260,15 +259,15 @@ extends JavaPlugin {
     private static Enchantment getEnchant(String name) {
         name = name.toLowerCase();
         Enchantment ench = null;
-        if (_p.getConfig().isString("enchantments." + name)) {
+        if(_p.getConfig().isString("enchantments." + name)) {
             try {
-                ench = Enchantment.getByName((String)_p.getConfig().getString("enchantments." + name).toUpperCase());
-            } catch (Exception var2_2) {}
+                ench = Enchantment.getByName(_p.getConfig().getString("enchantments." + name).toUpperCase());
+            } catch (Exception ex1) {}
         }
         if (ench == null) {
             try {
-                ench = Enchantment.getByName((String)name.toUpperCase());
-            } catch (Exception var2_3) {}
+                ench = Enchantment.getByName(name.toUpperCase());
+            } catch (Exception ex2) {}
         }
         return ench;
     }

@@ -108,10 +108,10 @@ public class CommandGive implements CommandExecutor {
         p.updateInventory();
         
         if(s.getName().equalsIgnoreCase(p.getName())) {
-            CItem.getLM().sendMessage(s, "cmd.give.successful.self", "You have placed %amount% of %name% in your Inventory.", new String[] {"%amount%", "%name%"}, new String[] {String.valueOf(item.getAmount()), Util.getItemName(s, item)});
+            CItem.getLM().sendMessage(s, "cmd.give.successful.self", "You have placed %amount% of %name% in your Inventory.", new String[] {"%amount%", "%name%"}, new String[] {String.valueOf(item.getAmount()), CItem.getLM().getItemName(puuid, item)});
         } else {
-            CItem.getLM().sendMessage(s, "cmd.give.successful.to", "You have %amount% x %name% given to %player%", new String[] {"%player%", "%amount%", "%name%"}, new String[] {p.getName(), String.valueOf(item.getAmount()), Util.getItemName(s, item)});
-            CItem.getLM().sendMessage(p, "cmd.give.successful.from", "%player% has given you %amount% x %name%", new String[] {"%player%", "%amount%", "%name%"}, new String[] {s.getName(), String.valueOf(item.getAmount()), Util.getItemName(p, item)});
+            CItem.getLM().sendMessage(s, "cmd.give.successful.to", "You have %amount% x %name% given to %player%", new String[] {"%player%", "%amount%", "%name%"}, new String[] {p.getName(), String.valueOf(item.getAmount()), CItem.getLM().getItemName(puuid, item)});
+            CItem.getLM().sendMessage(p, "cmd.give.successful.from", "%player% has given you %amount% x %name%", new String[] {"%player%", "%amount%", "%name%"}, new String[] {s.getName(), String.valueOf(item.getAmount()), CItem.getLM().getItemName(p.getUniqueId(), item)});
         }
         return true;
     }
