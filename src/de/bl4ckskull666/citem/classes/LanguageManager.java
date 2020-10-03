@@ -2,8 +2,6 @@ package de.bl4ckskull666.citem.classes;
 
 import de.bl4ckskull666.citem.CItem;
 import static de.bl4ckskull666.citem.utils.Util.UpperFirst;
-import de.bl4ckskull666.mu1ti1ingu41.Language;
-import de.bl4ckskull666.mu1ti1ingu41.Mu1ti1ingu41;
 import de.bl4ckskull666.mu1ti1ingu41.utils.Utils;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,21 +26,16 @@ import org.bukkit.inventory.ItemStack;
  * @author Bl4ckSkull666
  */
 public final class LanguageManager {
-    private boolean _isMu1ti1ingu41 = false;
     private boolean _isSpigot  = false;
     private FileConfiguration _fc = null;  
     public LanguageManager() {
-        if(Bukkit.getPluginManager().isPluginEnabled("Mu1ti1ingu41")) {
-            Mu1ti1ingu41.loadExternalDefaultLanguage(CItem.getPlugin(), "languages");
-            _isMu1ti1ingu41 = true;
-        } else {
-            _isSpigot = Bukkit.getVersion().toLowerCase().contains("spigot");
-            File f = new File(CItem.getPlugin().getDataFolder(), "language.yml");
-            if(!f.exists())
-                loadLanguageFile();
-            else
-                _fc = YamlConfiguration.loadConfiguration(f);
-        }
+        _isSpigot = Bukkit.getVersion().toLowerCase().contains("spigot");
+        File f = new File(CItem.getPlugin().getDataFolder(), "language.yml");
+        if(!f.exists())
+            loadLanguageFile();
+        else
+            _fc = YamlConfiguration.loadConfiguration(f);
+        
     }
     
     public void sendMessage(CommandSender cs, String path, String def) {
@@ -61,11 +54,6 @@ public final class LanguageManager {
     }
     
     public void sendMessage(Player p, String path, String def, String[] search, String[] replace) {
-        if(_isMu1ti1ingu41) {
-            Language.sendMessage(CItem.getPlugin(), p, path, def, search, replace);
-            return;
-        }
-        
         if(!_fc.isString(path) && !_fc.isConfigurationSection(path)) {
             p.sendMessage(replaceAll(def, search, replace));
             return;
@@ -98,11 +86,7 @@ public final class LanguageManager {
     }
     
     public String getItemName(UUID uuid, ItemStack item) {
-        if(_isMu1ti1ingu41)
-            return Language.getItemName(uuid, item);
-        
-        String extra = (item.getType().getMaxDurability() > 0)?(":" + item.getDurability()):"";
-        return getText(uuid, "item-name." + item.getType().name().toLowerCase() + extra, UpperFirst(item.getType().name().replace("_", " ")));
+        return getText(uuid, "item-name." + item.getType().name().toLowerCase(), UpperFirst(item.getType().name().replace("_", " ")));
     }
     
     public String getText(UUID uuid, String path, String def) {
@@ -110,9 +94,6 @@ public final class LanguageManager {
     }
     
     public String getText(UUID uuid, String path, String def, String[] search, String[] replace) {
-        if(_isMu1ti1ingu41)
-            return Language.getText(CItem.getPlugin(), uuid, path, def, search, replace);
-        
         if(!_fc.isString(path) && !_fc.isString(path + ".message"))
             return replaceAll(def, search, replace);
         
@@ -123,8 +104,6 @@ public final class LanguageManager {
     }
     
     public FileConfiguration getFile(UUID uuid) {
-        if(_isMu1ti1ingu41)
-            return Language.getMessageFile(CItem.getPlugin(), uuid);
         return _fc;
     }
     

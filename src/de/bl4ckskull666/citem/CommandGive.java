@@ -4,20 +4,22 @@ import de.bl4ckskull666.citem.classes.BookData;
 import de.bl4ckskull666.citem.utils.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-public class CommandGive implements CommandExecutor {
+public class CommandGive implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender s, Command c, String l, String[] a) {
         Player p = null;
@@ -57,7 +59,7 @@ public class CommandGive implements CommandExecutor {
         } else if(s instanceof Player && p == null || s instanceof Player && p.getName().equalsIgnoreCase(s.getName())) {
             p = (Player)s;
             if(!p.hasPermission("citem.use.give")) {
-                CItem.getLM().sendMessage(s, "cmd.give.no-perm", "You don't habe permission to use this command.");
+                CItem.getLM().sendMessage(s, "cmd.give.no-perm", "You don't have permission to use this command.");
                 return true;
             }
         } else {
@@ -207,7 +209,7 @@ public class CommandGive implements CommandExecutor {
                         try {
                             CItem.getLM().sendMessage(s, "cmd.enchant.body", "%id%. %name% | Min./Max.Lv.: %minlvl%/%maxlvl% | for Type: %for%", new String[] {"%id%", "%name%", "%minlvl%", "%maxlvl%", "%for%"}, new String[] {String.valueOf(i), enc.getName(), String.valueOf(enc.getStartLevel()), String.valueOf(enc.getMaxLevel()), enc.getItemTarget().name()});
                         } catch (NullPointerException ex) {
-                            s.sendMessage(ChatColor.translateAlternateColorCodes('&', "Error on list " + enc.getName()));
+                            s.sendMessage(ChatColor.translateAlternateColorCodes('&', "Error on list " + enc.getKey().getKey()));
                         }
                     }
                     i++;
@@ -335,5 +337,87 @@ public class CommandGive implements CommandExecutor {
             CItem.getLM().sendMessage(s, "cmd.help.body." + String.valueOf(i), "--", new String[] {"%cmd%"}, new String[] {c.getName()});
             i++;
         }
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender cs, Command c, String l, String[] a) {
+        List<String> list = new ArrayList<>();
+        if(a.length == 0 || (a.length == 1 && a[0].isEmpty())) {
+            list.add("me");
+            Bukkit.getOnlinePlayers().stream().forEach((p) -> {
+                list.add(p.getName());
+            });
+            
+            if(cs.hasPermission("citem.use.material"))
+                list.add("material");
+            if(cs.hasPermission("citem.use.enchant"))
+                list.add("enchant");
+            if(cs.hasPermission("citem.use.listbooks"))
+                list.add("listbooks");
+            if(cs.hasPermission("citem.use.savebook"))
+                list.add("savebook");
+            if(cs.hasPermission("citem.use.removebook"))
+                list.add("removebook");
+            if(cs.hasPermission("citem.use.load"))
+                list.add("load");
+            if(cs.hasPermission("citem.use.save"))
+                list.add("save");
+            if(cs.hasPermission("citem.use.help"))
+                list.add("help");
+        } else if(a.length == 1) {
+            if("me".startsWith(a[0].toLowerCase()))
+                list.add("me");
+            if("material".startsWith(a[0].toLowerCase()))
+                list.add("material");
+            if("enchant".startsWith(a[0].toLowerCase()))
+                list.add("enchant");
+            if("listbooks".startsWith(a[0].toLowerCase()))
+                list.add("listbooks");
+            if("savebook".startsWith(a[0].toLowerCase()))
+                list.add("savebook");
+            if("removebook".startsWith(a[0].toLowerCase()))
+                list.add("removebook");
+            if("load".startsWith(a[0].toLowerCase()))
+                list.add("load");
+            if("save".startsWith(a[0].toLowerCase()))
+                list.add("save");
+            if("help".startsWith(a[0].toLowerCase()))
+                list.add("help");
+            
+            Bukkit.getOnlinePlayers().stream().forEach((p) -> {
+                if(p.getName().toLowerCase().startsWith(a[0].toLowerCase()))
+                    list.add(p.getName());
+            });
+        } else if(a.length == 3) {
+            if(a[2].isEmpty() || Util.isNumeric(a[1])) {
+                for(int i = 0; i < 10; i++) {
+                    list.add(a[2] + i);
+                }
+            }
+        } else if(a.length == 2) {
+            for(Material mat: Material.values()) {
+                if(a[1].isEmpty() || mat.getKey().getKey().toLowerCase().startsWith(a[1].toLowerCase()) || mat.getKey().getKey().equalsIgnoreCase(a[1]))
+                    list.add(mat.getKey().getNamespace() + ":" + mat.getKey().getKey());
+            }
+        } else if(a.length > 3) {
+            List<String> options = new ArrayList<>();
+            options.add("lore:");
+            options.add("name:");
+            options.add("armorcolor:");
+            options.add("dyecolor:");
+            options.add("book:");
+            options.add("head:");
+            options.add("phead:");
+            options.add("player:");
+            options.add("pat:");
+            options.add("enchant:");
+            
+            String search = a[a.length-1].toLowerCase();
+            for(String opt: options) {
+                if(search.isEmpty() || opt.startsWith(search) || opt.equalsIgnoreCase(search))
+                    list.add(opt);
+            }
+        }
+        return list;
     }
 }

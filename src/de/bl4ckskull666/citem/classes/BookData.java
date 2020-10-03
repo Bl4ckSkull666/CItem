@@ -1,16 +1,8 @@
-/*
- * Decompiled with CFR 0_114.
- * 
- * Could not load the following classes:
- *  org.bukkit.inventory.ItemStack
- *  org.bukkit.inventory.meta.BookMeta
- *  org.bukkit.inventory.meta.ItemMeta
- */
 package de.bl4ckskull666.citem.classes;
 
 import de.bl4ckskull666.citem.CItem;
-import de.bl4ckskull666.utils.InvSerialization.BookSerialization;
-import de.bl4ckskull666.utils.InvSerialization.Util;
+import de.bl4ckskull666.citem.serialization.BookSerialization;
+import de.bl4ckskull666.citem.utils.Util;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -82,7 +74,7 @@ public final class BookData {
                 
                 if(book.isConfigurationSection("pages")) {
                     for(String k: book.getConfigurationSection("pages").getKeys(false)) {
-                        if(!Util.isNum(k))
+                        if(!Util.isNumeric(k))
                             continue;
                         
                         if(book.isString("pages." + k)) {

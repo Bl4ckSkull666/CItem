@@ -2,19 +2,25 @@ package de.bl4ckskull666.citem;
 
 import de.bl4ckskull666.citem.classes.BookData;
 import de.bl4ckskull666.citem.classes.LanguageManager;
+import de.bl4ckskull666.citem.utils.HeadDatabase;
 import de.bl4ckskull666.citem.utils.Util;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -95,25 +101,39 @@ extends JavaPlugin {
     }
 
     public static ItemStack getItem(String str) {
+        return getItem(str, null);
+    }
+    
+    public static ItemStack getItem(String str, Player p) {
         String[] args = str.split(" ");
-        if(args.length < 2) {
-            _p.getLogger().log(Level.INFO, "{0} hat zu wenig Argumente Mindestens : Itemname Itemmenge - sind gefordert.", str);
-            return null;
+        ItemStack i = null;
+        if(p == null || p != null && !args[0].equalsIgnoreCase("hand")) {
+            if(args.length < 2) {
+                _p.getLogger().log(Level.INFO, "{0} hat zu wenig Argumente Mindestens : Itemname Itemmenge - sind gefordert.", str);
+                return null;
+            }
+
+            if(!Util.isNumeric(args[1]) && p == null && !args[0].equalsIgnoreCase("hand")) {
+                _p.getLogger().log(Level.INFO, "{0} muss eine Zahl sein", args[1]);
+                return null;
+            }
+
+            String[] itemname = args[0].split("\\:");
+            if(Material.matchMaterial(itemname[0]) == null) {
+                _p.getLogger().log(Level.INFO, "{0} ist kein gultiges Item.", itemname[0]);
+                return null;
+            }
+
+            i = itemname.length >= 2 && Util.isNumeric(itemname[1]) ? new ItemStack(Material.matchMaterial(itemname[0]), Integer.parseInt(args[1]), Short.parseShort(itemname[1])) : new ItemStack(Material.matchMaterial(itemname[0]), Integer.parseInt(args[1]));
+            i.setItemMeta(Bukkit.getItemFactory().getItemMeta(i.getType()));
+        } else {
+            if(p.getInventory().getItemInMainHand() == null) {
+                _p.
+                _p.getLogger().log(Level.INFO, "{0} muss eine Zahl sein", args[1]);
+                return null;
+            }
         }
         
-        if(!Util.isNumeric(args[1])) {
-            _p.getLogger().log(Level.INFO, "{0} muss eine Zahl sein", args[1]);
-            return null;
-        }
-        
-        String[] itemname = args[0].split("\\:");
-        if(Material.matchMaterial(itemname[0]) == null) {
-            _p.getLogger().log(Level.INFO, "{0} ist kein gultiges Item.", itemname[0]);
-            return null;
-        }
-        
-        ItemStack i = itemname.length >= 2 && Util.isNumeric(itemname[1]) ? new ItemStack(Material.matchMaterial(itemname[0]), Integer.parseInt(args[1]), Short.parseShort(itemname[1])) : new ItemStack(Material.matchMaterial(itemname[0]), Integer.parseInt(args[1]));
-        i.setItemMeta(Bukkit.getItemFactory().getItemMeta(i.getType()));
         
         if(args.length >= 3) {
             block18:
@@ -133,18 +153,26 @@ extends JavaPlugin {
                     case "name":
                         CItem.setItemName(i, sargs[1]);
                         break;
-                    case "color":
-                        CItem.setColor(i, sargs[1]);
+                    case "armorcolor":
+                        CItem.setArmorColor(i, sargs[1]);
+                        break;
+                    case "dyecolor":
+                        CItem.setDyeColor(i, sargs[1]);
                         break;
                     case "book":
                         CItem.setBook(i, sargs[1]);
                         break;
                     case "head":
+                        i = CItem.setHead(i, sargs[1]);
+                        break;
+                    case "phead":
                         CItem.setPlayerHead(i, sargs[1]);
                         break;
                     case "player":
                         CItem.checkMyName(i, sargs[1]);
                         break;
+                    case "pat":
+                        CItem.setPattern(i, sargs[1]);
                     case "enchant":
                         if(!sargs[1].equalsIgnoreCase("min") && !sargs[1].equalsIgnoreCase("max"))
                             break;
@@ -179,16 +207,50 @@ extends JavaPlugin {
         i.setItemMeta(im);
     }
 
-    private static void setColor(ItemStack i, String color) {
+    private static void setArmorColor(ItemStack i, String color) {
         if(i.getItemMeta() instanceof LeatherArmorMeta) {
             LeatherArmorMeta lam = (LeatherArmorMeta)i.getItemMeta();
             String[] rgb = color.split("\\,");
             if(rgb.length == 3 && Util.isNumeric(rgb[0]) && Util.isNumeric(rgb[1]) && Util.isNumeric(rgb[2]) && Integer.parseInt(rgb[0]) >= 0 && Integer.parseInt(rgb[0]) <= 255 && Integer.parseInt(rgb[1]) >= 0 && Integer.parseInt(rgb[1]) <= 255 && Integer.parseInt(rgb[2]) >= 0 && Integer.parseInt(rgb[2]) <= 255) {
                 Color c = Color.fromRGB(Integer.parseInt(rgb[0]), Integer.parseInt(rgb[1]), Integer.parseInt(rgb[2]));
                 lam.setColor(c);
+            } else {
+                for(DyeColor dc: DyeColor.values()) {
+                    if(dc.name().equalsIgnoreCase(color))
+                        lam.setColor(dc.getColor());
+                }
             }
             i.setItemMeta((ItemMeta)lam);
         }
+    }
+    
+    private static void setDyeColor(ItemStack i, String color) {
+        BannerMeta bm = (BannerMeta)i.getItemMeta();
+    }
+    
+    private static void setPattern(ItemStack i, String colpat) {
+        if(!(i.getItemMeta() instanceof BannerMeta))
+            return;
+        
+        BannerMeta bm = (BannerMeta)i.getItemMeta();
+        String[] a = colpat.split("\\|");
+        if(a.length == 2) {
+            DyeColor dc = null;
+            PatternType pt = null;
+            for(DyeColor dcs: DyeColor.values()) {
+                if(dcs.name().equalsIgnoreCase(a[0]))
+                    dc = dcs; break;
+            }
+            
+            for(PatternType pts: PatternType.values()) {
+                if(pts.name().equalsIgnoreCase(a[1]))
+                    pt = pts; break;
+            }
+            
+            if(dc != null && pt != null)
+                bm.addPattern(new Pattern(dc, pt));
+        }
+        i.setItemMeta((ItemMeta)bm);
     }
 
     private static void checkMyName(ItemStack i, String name) {
@@ -211,14 +273,39 @@ extends JavaPlugin {
             i.setItemMeta(bm);
         }
     }
+    
+    private static ItemStack setHead(ItemStack i, String value) {
+        if (!(i.getItemMeta() instanceof SkullMeta)) {
+            return i;
+        }
+        
+        return HeadDatabase.getSkullFromValue(value);
+    }
 
     private static void setPlayerHead(ItemStack i, String name) {
         if (!(i.getItemMeta() instanceof SkullMeta)) {
             return;
         }
+        
         SkullMeta sm = (SkullMeta)i.getItemMeta();
-        sm.setOwner(name);
-        sm.setDisplayName(name);
+        if(name.length() >= 32) {
+            name = name.replaceAll("-", "");
+            name = name.replaceAll("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+            try {
+                UUID uuid = UUID.fromString(name);
+                OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
+                if(op != null) {
+                    sm.setOwningPlayer(op);
+                    sm.setDisplayName(op.getName());
+                }
+            } catch(Exception ex) {
+                sm.setOwner(name);
+                sm.setDisplayName(name);
+            }
+        } else {
+            sm.setOwner(name);
+            sm.setDisplayName(name);
+        }
         i.setItemMeta(sm);
     }
 

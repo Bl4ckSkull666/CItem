@@ -3,7 +3,8 @@ version: 1.0
 author: Bl4ckSkull666
 main: de.bl4ckskull666.citem.CItem
 softdepend: [Mu1ti1ingu41]
-website: http://www.AMC-Server.de
+api-version: 1.14
+website: http://www.Craft-my-Life.de
 prefix: CI
 commands:
   give:
