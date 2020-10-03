@@ -20,21 +20,25 @@ import org.bukkit.inventory.meta.SkullMeta;
  * @author Bl4ckSkull666
  */
 public class HeadDatabase {
-    public static ItemStack getSkullFromValue(String val) {
-        return itemWithBase64(val);
+    public static ItemStack getSkullFromValue(ItemStack i, String val) {
+        return itemWithBase64(i, val);
     }
 
     //SkullCreator
     private static Method metaSetProfileMethod;
     private static Field metaProfileField;
 
-    public static ItemStack itemWithBase64(String base64) {
+    public static ItemStack itemWithBase64(ItemStack i, String base64) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+        if(i != null)
+            item = i;
+        
         notNull(base64, "base64");
 
         if (!(item.getItemMeta() instanceof SkullMeta)) {
             return null;
         }
+        
         SkullMeta meta = (SkullMeta) item.getItemMeta();
         mutateItemMeta(meta, base64);
         item.setItemMeta(meta);

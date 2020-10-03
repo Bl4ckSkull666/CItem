@@ -163,7 +163,7 @@ extends JavaPlugin {
                         CItem.setBook(i, sargs[1]);
                         break;
                     case "head":
-                        i = CItem.setHead(i, sargs[1]);
+                        CItem.setHead(i, sargs[1]);
                         break;
                     case "phead":
                         CItem.setPlayerHead(i, sargs[1]);
@@ -274,12 +274,12 @@ extends JavaPlugin {
         }
     }
     
-    private static ItemStack setHead(ItemStack i, String value) {
+    private static void setHead(ItemStack i, String value) {
         if (!(i.getItemMeta() instanceof SkullMeta)) {
-            return i;
+            return;
         }
         
-        return HeadDatabase.getSkullFromValue(value);
+        HeadDatabase.getSkullFromValue(i, value);
     }
 
     private static void setPlayerHead(ItemStack i, String name) {
